@@ -6,107 +6,129 @@ public class Forca {
         // Criando um scanner
         Scanner scanner = new Scanner(System.in);
 
-        // Definindo a palavra
-        String palavraSecreta = sorteador();
-
-        // Definindo variáveis úteis para o game
+        // Definindo variáveis que serão utilizadas no jogo
         int vidas = 3;
+        String palavra;
+        String letra;
+        String letrasErradas = "";
         String[] letrasCorretas = new String[5];
         int indiceLetrasCorretas = 0;
-        String letrasDigitadas = "";
 
-        // Laço de repetição
+        // Sorteando uma palavra aleatória
+        String palavraSecreta = sortearPalavra();
+
+        // Laço de repetição do jogo
         while (vidas > 0) {
-            // Atualizando a palavra
-            String palavra = atualizarPalavra(palavraSecreta, letrasCorretas);
+            // Atualizando a palavra: letras corretas e/ou "*"
+            palavra = atualizarPalavra(palavraSecreta, letrasCorretas);
+
+            // Verificando se a palavra já está correta
             if (palavra.equals(palavraSecreta)) {
                 break;
             }
 
-            // Exibindo ao jogador as informações
-            System.out.println("=============================");
-            System.out.println("Palavra: " + palavra);
-            System.out.println("Letras digitadas: " + letrasDigitadas);
+            // Exibindo as informações ao jogador
+            System.out.println("\n========================");
+            System.out.println("Letras erradas: " + letrasErradas);
             System.out.println("Vidas: " + vidas);
-            System.out.println("------------");
+            System.out.println("------------------------");
+            System.out.println("Palavra: " + palavra);
 
-            // Solicitando ao usuário uma letra
+            // Solicitando ao usuário que digite uma letra
             System.out.print("Digite uma letra: ");
-            String letra = scanner.next().toLowerCase();
+            letra = scanner.next();
 
             // Verificando se a entrada é a palavra
             if (letra.equals(palavraSecreta)) {
                 break;
-            } else if (letra.length() == 5) {
+            }
+
+            // Verificando se a entrada é um "chute" e descontando vida
+            else if (letra.length() == 5) {
                 vidas--;
-            } else if (letra.length() > 1) {
-                System.out.println("Digite apenas UMA letra!!!");
-            } else if (palavraSecreta.contains(letra)) {
+            }
+
+            // Verificando se a entrada contem mais de um digito (a diferença é que o de cima pode ser um chute de palavra, aqui um erro de digitação
+            else if (letra.length() > 1) {
+                System.out.println("Digite apenas UMA letra ou chute a palavra (5 letras).");
+            }
+
+            // Verificando se o usuário já digitou a letra
+            else if (letrasErradas.contains(letra)) {
+                System.out.println("Você já digitou essa letra.");
+            }
+
+            // Verificando se a palavra contém a letra
+            else if (palavraSecreta.contains(letra)) {
                 letrasCorretas[indiceLetrasCorretas] = letra;
                 indiceLetrasCorretas++;
-            } else {
-                letrasDigitadas = String.format("%s %s", letrasDigitadas, letra);
+            }
+
+            // Adicionando a letra à letrasErradas e retirando uma vida do usuário
+            else {
+                letrasErradas = String.format("%s %s", letrasErradas, letra);
                 vidas--;
             }
         }
-        System.out.println("=============================");
+        System.out.println("========================");
 
-        // Mensagem de vitória ou derrota
+        // Exibindo uma mensagem de vitória ou derrada
         if (vidas > 0) {
-            System.out.println("PARABÉNS! VOCÊ GANHOU!!!!!! \nA palavra era: " + palavraSecreta);
+            System.out.println("VOCÊ GANHOU, PARABÉNS! \nA palavra era " + palavraSecreta);
         } else {
-            System.out.println("Você perdeu :( \nA palavra era: " + palavraSecreta);
+            System.out.println("Você perdeu :( \nA palavra era " + palavraSecreta);
         }
 
-        // Fechando o scanne
+        // Fechando o scanner
         scanner.close();
     }
 
-    // Sortea uma palavra
-    public static String sorteador() {
-        // Criando um random
-        Random random = new Random();
-
-        // Lista de palavras para ser sorteadas
-        String[] palavras = {"amigo", "pedra", "verde", "festa", "nuvem", "poema"};
-
-        // Sorteando um número aleatório para ser o indice para acessar alguma palavra acima
-        int indice = random.nextInt(0, palavras.length);
-
-        // Retornando a palavra
-        return palavras[indice];
-    }
-
-    // Verifica a palavra e retorna com as letras acertadas e o "*"
+    // Metodo que atualiza a palavra: letras corretas e/ou "*"
     public static String atualizarPalavra(String palavraSecreta, String[] letrasCorretas) {
-        // Iniciando a variável que será retornada
+        // Criando uma StringBuilder que será retornada com às letras e/ou "*"
         StringBuilder palavra = new StringBuilder();
 
-        // Iterando em letra por letra da palavra secreta
+        // Iterrando letra por letra em palavraSecreta
         for (char letraSecreta : palavraSecreta.toCharArray()) {
             boolean letraEncontrada = false;
 
-            // Verificando se a letra secreta está nas letras corretas
+            // Encontrando a posição correta das letras
             for (String letraCorreta : letrasCorretas) {
-                // Definindo a variavel para o if não ficar confuso
+                // Definindo uma váriavel String da letraSecreta para o if não ficar confuso
                 String letraSecretaString = String.valueOf(letraSecreta);
 
-                // Verificando se a letra equivale e parando o laço
+                // Verificando se a letra atual equivale, caso sim, o laço irá parar
                 if ((letraCorreta != null) && (letraCorreta.equals(letraSecretaString))) {
                     letraEncontrada = true;
                     break;
                 }
             }
 
-            // Se a letra foi encontrada, adiciona ela à palavra, senão adiciona "*"
+            // Se a letra foi encontrada na posição correta, será adicionada a palavra
             if (letraEncontrada) {
                 palavra.append(letraSecreta);
             } else {
-                palavra.append('*');
+                palavra.append("*");
             }
+
         }
 
         // Retornando a palavra atualizada
         return palavra.toString();
+    }
+
+    // Metodo que sortea uma palavra aleatória
+    public static String sortearPalavra() {
+        // Criando um sorteador
+        Random random = new Random();
+
+        // Array com palavras para ser sorteada
+        String[] palavras = {"amigo", "festa", "nuvem", "pedra", "poema"};
+
+        // Sorteando um número para ser o indice para acessar a palavra aleatória
+        int indice = random.nextInt(0, palavras.length);
+
+        // Retornando a palavra
+        return palavras[indice];
     }
 }
